@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  web:
+    container_name: flight-forecast-web
+    image: flight-forecast-web
+    build:
+      context: ./web
+      dockerfile: Dockerfile.prod
+    env_file:
+      - ./web/.env
+    restart: unless-stopped
+  db:
+    container_name: flight-forecast-db
+    image: postgres
+    ports:
+      - ${DB_PORT}:5432
+    env_file:
+      - .env
+    restart: unless-stopped
+  api:
+    container_name: flight-forecast-api
+    image: flight-forecast-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+      target: ${STAGE}
+    env_file:
+      - ./api/.env
+    links:
+        - db
+    depends_on:
+      - db
+    restart: unless-stopped
+  ml:
+    image: flight-forecast-ml
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    restart: unless-stopped
+  nginx:
+    container_name: flight-forecast-nginx
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    links:
+      - "web"
+      - "api"
+    depends_on:
+      - web
+      - api
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./certbot/www:/var/www/certbot/:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+  certbot:
+    container_name: flight-forecast-certbot
+    depends_on:
+      - nginx
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    command: certonly --webroot --webroot-path /var/www/certbot/ --email ${CERTBOT_EMAIL} --agree-tos -d ${DOMAIN} -d www.${DOMAIN} -d ${API_DOMAIN} -d www.${API_DOMAIN} --non-interactive
