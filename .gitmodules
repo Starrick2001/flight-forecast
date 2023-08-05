@@ -1,0 +1,3 @@
+[submodule "flight-forecast-fe"]
+	path = flight-forecast-fe
+	url = git@github.com:Starrick2001/flight-forecast-fe.git
