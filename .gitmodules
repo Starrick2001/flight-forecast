@@ -1,3 +1,12 @@
 [submodule "flight-forecast-fe"]
 	path = flight-forecast-fe
 	url = git@github.com:Starrick2001/flight-forecast-fe.git
+[submodule "flight-forecast-api"]
+	path = flight-forecast-api
+	url = git@github.com:Starrick2001/flight-forecast-api.git
+[submodule "flight-forecast-train"]
+	path = flight-forecast-train
+	url = git@github.com:Starrick2001/flight-forecast-train.git
+[submodule "flight-forecast-ml"]
+	path = flight-forecast-ml
+	url = git@github.com:Starrick2001/flight-forecast-ml.git
